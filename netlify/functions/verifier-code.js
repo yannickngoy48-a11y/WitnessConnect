@@ -1,3 +1,4 @@
+import { getStore } from "@netlify/blobs";
 export default async (req, context) => {
   if (req.method !== "POST") {
     return new Response(
