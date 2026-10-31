@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Witness Connect</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #101010;
+      color: white;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background: #181818;
+      color: #00e5ff;
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .video {
+      margin: 20px;
+      height: 350px;
+      border-radius: 15px;
+      background: #252525;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .play {
+      font-size: 65px;
+      color: #00e5ff;
+    }
+
+    .bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      padding: 15px 5px;
+      background: #181818;
+    }
+
+    button {
+      border: none;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+    }
+
+    .like {
+      color: #ff4081;
+      font-size: 18px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>WITNESS CONNECT</header>
+
+<div style="text-align:center; padding:15px;">
+  <input type="file" id="choisirVideo" accept="video/*">
+</div>
+
+<video id="maVideo" controls
+  style="display:none; width:90%; margin:10px auto; max-height:400px;">
+</video>
+
+<div style="background:#202020; padding:20px; margin:15px; border-radius:15px;">
+  <h2>Bienvenue sur Witness Connect</h2>
+
+  <input id="email" type="email"
+    placeholder="Ton adresse e-mail"
+    style="padding:12px;width:100%;margin-bottom:10px;">
+
+  <input id="motdepasse" type="password"
+    placeholder="Ton mot de passe"
+    style="padding:12px;width:100%;margin-bottom:10px;">
+
+  <button onclick="inscription()">Créer un compte</button>
+  <button onclick="connexion()">Se connecter</button>
+
+  <p id="messageCompte"></p>
+</div>
+
+  <div class="video">
+    <div class="play">▶</div>
+    <h3>Bienvenue sur Witness Connect !</h3>
+    <p>Les vidéos commencent ici.</p>
+    <button class="like" onclick="aimer(this)">♡ J'aime <span>0</span></button>
+  </div>
+
+<div style="margin-top:15px;">
+  <input id="commentaire" type="text"
+    placeholder="Écris un commentaire..."
+    style="padding:10px; width:75%;">
+  <button onclick="ajouterCommentaire()">Envoyer</button>
+  <div id="listeCommentaires"></div>
+</div>
+
+<div style="text-align:center; padding:20px; background:#202020; margin:15px; border-radius:15px;">
+  
+<input type="file" id="photoProfil" accept="image/*">
+<br><br>
+<img id="imageProfil" src=""
+style="width:100px;height:100px;border-radius:50%;object-fit:cover;display:none;">
+
+  <h2>Yannick Ngoy</h2>
+  <p>Bienvenue sur mon profil Witness Connect !</p>
+  
+<p>Vidéos : 0 | Abonnés : <span id="abonnes">0</span> | Abonnements : 0</p>
+
+<button onclick="abonner()" style="background:#00e5ff;color:black;padding:10px 20px;border-radius:20px;">
+  + S'abonner
+</button>
+
+</div>
+
+  <nav class="bottom">
+    <button>🏠 Accueil</button>
+    <button>🔍 Découvrir</button>
+    <button>➕ Publier</button>
+    <button>👤 Profil</button>
+  </nav>
+
+  <script>
+    function aimer(bouton) {
+      const compteur = bouton.querySelector("span");
+      let nombre = Number(compteur.textContent);
+      nombre++;
+      compteur.textContent = nombre;
+      bouton.firstChild.textContent = "♥ J'aime ";
+    }
+
+document.getElementById("choisirVideo").addEventListener("change", function() {
+  const fichier = this.files[0];
+
+  if (fichier) {
+    const lecteur = document.getElementById("maVideo");
+    lecteur.src = URL.createObjectURL(fichier);
+    lecteur.style.display = "block";
+    lecteur.play();
+  }
+});
+
+function ajouterCommentaire() {
+  const champ = document.getElementById("commentaire");
+  const texte = champ.value.trim();
+
+  if (texte !== "") {
+    const nouveau = document.createElement("p");
+    nouveau.textContent = "💬 " + texte;
+    document.getElementById("listeCommentaires").appendChild(nouveau);
+    champ.value = "";
+  }
+}
+
+document.getElementById("photoProfil").addEventListener("change", function() {
+  const fichier = this.files[0];
+
+  if (fichier) {
+    const image = document.getElementById("imageProfil");
+    image.src = URL.createObjectURL(fichier);
+    image.style.display = "inline-block";
+  }
+});
+ 
+let nombreAbonnes = 0;
+
+function abonner() {
+  nombreAbonnes++;
+  document.getElementById("abonnes").textContent = nombreAbonnes;
+}
+ </script>
+
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+
+
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyDpcOnYRMpoivJkejwvxgS4yTMn_xYVOPc",
+  authDomain: "witness-connect.firebaseapp.com",
+  projectId: "witness-connect",
+  storageBucket: "witness-connect.firebasestorage.app",
+  messagingSenderId: "649553916449",
+  appId: "1:649553916449:web:ece65b5ae11aac0bd22960",
+  measurementId: "G-D9ETRS0ZR7"
+};
+  
+
+  const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+window.inscription = async function() {
+  const email = document.getElementById("email").value;
+  const motdepasse = document.getElementById("motdepasse").value;
+
+  try {
+    const utilisateur = await createUserWithEmailAndPassword(auth, email, motdepasse);
+
+await sendEmailVerification(utilisateur.user);
+  document.getElementById("messageCompte").textContent =
+  "Compte créé ! Consulte ton e-mail pour vérifier ton adresse avant de te connecter.";
+  } catch (erreur) {
+    document.getElementById("messageCompte").textContent = erreur.message;
+  }
+};
+
+window.connexion = async function() {
+  const email = document.getElementById("email").value;
+  const motdepasse = document.getElementById("motdepasse").value;
+
+  try {
+    const utilisateur = await signInWithEmailAndPassword(auth, email, motdepasse);
+
+if (!utilisateur.user.emailVerified) {
+  document.getElementById("messageCompte").textContent =
+    "Vérifie ton adresse e-mail avant de te connecter.";
+
+  return;
+}
+    document.getElementById("messageCompte").textContent = "Connexion réussie !";
+  } catch (erreur) {
+    document.getElementById("messageCompte").textContent = erreur.message;
+  }
+};
+
+  console.log("Witness Connect est connecté à Firebase !");
+</script>
+</body>
+</html>
